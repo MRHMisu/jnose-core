@@ -349,9 +349,10 @@ public class JNoseCore implements PropertyChangeListener {
                                 testClass.setProjectName(projectName);
                                 testClass.setPathFile(filePath.toString());
                                 if (isTestFile(testClass)) {
-                                    if (!testClass.getJunitVersion().equals(TestClass.JunitVersion.None)) {
-                                        jUnitVersion[0] = testClass.getJunitVersion();
-                                    }
+                                    jUnitVersion[0] = TestClass.JunitVersion.JUnit3;
+//                                    if (!testClass.getJunitVersion().equals(TestClass.JunitVersion.None)) {
+//
+//                                    }
                                 }
                             }
                         }
