@@ -128,8 +128,7 @@ public class JNoseCoreTest {
 
     @Test
     public void jNoseCoreTest() {
-        //String pathProjeto = "/Users/mrhmisu/.jnose_projects/commons-logging";
-        String pathProjeto = "/Users/mrhmisu/.jnose_projects/commons-bcel";
+        String pathProjeto = System.getProperty("user.dir");
         try {
             List<TestClass> listFileTests = getInstanceJNoseCore().getFilesTest(pathProjeto);
             System.out.println(listFileTests.size());
