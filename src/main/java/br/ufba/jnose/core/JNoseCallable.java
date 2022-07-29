@@ -19,7 +19,7 @@ public class JNoseCallable implements Callable<List<TestClass>> {
     private JNoseCore jNoseCore;
 
 
-    public JNoseCallable(Path filePath, String projectName, Path startDir, JNoseCore jNoseCore){
+    public JNoseCallable(Path filePath, String projectName, Path startDir, JNoseCore jNoseCore) {
         this.filePath = filePath;
         this.projectName = projectName;
         this.startDir = startDir;
@@ -37,13 +37,23 @@ public class JNoseCallable implements Callable<List<TestClass>> {
                     fileNameWithoutExtension.matches("^.*test\\d*$") ||
                             fileNameWithoutExtension.matches("^.*tests\\d*$") ||
                             fileNameWithoutExtension.matches("^test.*") ||
-                            fileNameWithoutExtension.matches("^tests.*"))) {
+                            fileNameWithoutExtension.matches("^tests.*") ||
+                            fileNameWithoutExtension.matches("^testcase.*") ||
+                            fileNameWithoutExtension.matches("^testcases.*") ||
+                            fileNameWithoutExtension.matches("^.*testcase\\d*$") ||
+                            fileNameWithoutExtension.matches("^.*testcases\\d*$")
+            )) {
 
-                Boolean testTrueFinal = fileNameWithoutExtension.matches("^.*test\\d*$");
-                Boolean testsTrueFinal = fileNameWithoutExtension.matches("^.*tests\\d*$");
+                Boolean isStartsWithTest = fileNameWithoutExtension.matches("^test.*");
+                Boolean isStartsWithTests = fileNameWithoutExtension.matches("^tests.*");
+                Boolean isStartWithTestCase = fileNameWithoutExtension.matches("^testcase.*");
+                Boolean isStartWithTestCases = fileNameWithoutExtension.matches("^testcases.*");
 
-                Boolean testTrueInicio = fileNameWithoutExtension.matches("^test.*");
-                Boolean testsTrueInicio = fileNameWithoutExtension.matches("^tests.*");
+                Boolean isEndsWithTest = fileNameWithoutExtension.matches("^.*test\\d*$");
+                Boolean isEndsWithTests = fileNameWithoutExtension.matches("^.*tests\\d*$");
+                Boolean isEndsWithTestCase = fileNameWithoutExtension.matches("^.*testcase\\d*$");
+                Boolean isEndsWithTestCases = fileNameWithoutExtension.matches("^.*testcases\\d*$");
+
 
                 TestClass testClass = new TestClass();
                 testClass.setProjectName(projectName);
@@ -53,22 +63,40 @@ public class JNoseCallable implements Callable<List<TestClass>> {
                     LOGGER.log(Level.INFO, "getFilesTest: " + testClass.getPathFile());
                     String productionFileName = "";
                     int index = 0;
-                    if(testTrueInicio) index = 0;
-                    if(testsTrueInicio) index = 0;
-                    if(testTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("test");
-                    if(testsTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("tests");
+
+                    if (isEndsWithTest) index = testClass.getName().toLowerCase().lastIndexOf("test");
+                    if (isEndsWithTestCase) index = testClass.getName().toLowerCase().lastIndexOf("testcase");
+                    if (isEndsWithTestCases) index = testClass.getName().toLowerCase().lastIndexOf("testcases");
+                    if (isEndsWithTests) index = testClass.getName().toLowerCase().lastIndexOf("tests");
 
                     if (index > 0) {
-                        if(testTrueFinal)
+                        if (isEndsWithTest) {// test...
                             productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("test")) + ".java";
-                        if(testsTrueFinal)
+                        }
+                        if (isEndsWithTestCase) {// testcase...
+                            productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("testcase")) + ".java";
+                        }
+                        if (isEndsWithTestCases) {// testcases...
+                            productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("testcases")) + ".java";
+                        }
+                        if (isEndsWithTests) {//tests...
                             productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("tests")) + ".java";
-                    }else{
-                        if(testTrueInicio)
-                            productionFileName = testClass.getName().substring(4, testClass.getName().length()) + ".java";
-                        if(testsTrueInicio)
-                            productionFileName = testClass.getName().substring(5, testClass.getName().length()) + ".java";
+                        }
+                    } else {
+                        if (isEndsWithTest) {// test...
+                            productionFileName = testClass.getName().substring(4) + ".java";
+                        }
+                        if (isStartWithTestCase) {// testcase...
+                            productionFileName = testClass.getName().substring(8) + ".java";
+                        }
+                        if (isStartWithTestCases) {// testcases...
+                            productionFileName = testClass.getName().substring(9) + ".java";
+                        }
+                        if (isEndsWithTests) {// tests...
+                            productionFileName = testClass.getName().substring(5) + ".java";
+                        }
                     }
+
                     testClass.setProductionFile(jNoseCore.getFileProduction(startDir.toString(), productionFileName));
 
                     if (!testClass.getProductionFile().isEmpty()) {

@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class JNoseCore implements PropertyChangeListener{
+public class JNoseCore implements PropertyChangeListener {
 
     private ExecutorService threadpool;
 
@@ -41,7 +41,7 @@ public class JNoseCore implements PropertyChangeListener{
             public Boolean assertionRoulette() {
                 return true;
             }
-           
+
 
             @Override
             public Boolean conditionalTestLogic() {
@@ -153,15 +153,15 @@ public class JNoseCore implements PropertyChangeListener{
 
         List<TestClass> lista = jNoseCore.getFilesTest(directoryPath);
 
-        for(TestClass testClass : lista){
-            for (TestSmell testSmell : testClass.getListTestSmell()){
+        for (TestClass testClass : lista) {
+            for (TestSmell testSmell : testClass.getListTestSmell()) {
                 System.out.println(
                         testClass.getPathFile() + ";" +
                                 testClass.getProductionFile() + ";" +
                                 testClass.getJunitVersion() + ";" +
-                        testSmell.getName() + ";" +
-                        testSmell.getMethod() + ";" +
-                        testSmell.getRange());
+                                testSmell.getName() + ";" +
+                                testSmell.getMethod() + ";" +
+                                testSmell.getRange());
             }
 
 //            System.out.println(testClass.getLineSumTestSmells());
@@ -202,7 +202,7 @@ public class JNoseCore implements PropertyChangeListener{
         }
 
 
-        for(Future<List<TestClass>> future : futures){
+        for (Future<List<TestClass>> future : futures) {
             files.addAll(future.get());
         }
 
@@ -210,16 +210,16 @@ public class JNoseCore implements PropertyChangeListener{
     }
 
 
-    private Boolean todosExecutados(List<Future<List<TestClass>>> futures){
-        for(Future future : futures){
-            if(future.isDone() == false){
+    private Boolean todosExecutados(List<Future<List<TestClass>>> futures) {
+        for (Future future : futures) {
+            if (future.isDone() == false) {
                 return false;
             }
         }
         return true;
     }
 
-    private List<TestClass> processarPath(Path filePath, String projectName, Path startDir){
+    private List<TestClass> processarPath(Path filePath, String projectName, Path startDir) {
 
         List<TestClass> files = new ArrayList<>();
 
@@ -230,7 +230,12 @@ public class JNoseCore implements PropertyChangeListener{
                     fileNameWithoutExtension.matches("^.*test\\d*$") ||
                             fileNameWithoutExtension.matches("^.*tests\\d*$") ||
                             fileNameWithoutExtension.matches("^test.*") ||
-                            fileNameWithoutExtension.matches("^tests.*"))) {
+                            fileNameWithoutExtension.matches("^tests.*") ||
+                            fileNameWithoutExtension.matches("^testcase.*") ||
+                            fileNameWithoutExtension.matches("^testcases.*") ||
+                            fileNameWithoutExtension.matches("^.*testcase\\d*$") ||
+                            fileNameWithoutExtension.matches("^.*testcases\\d*$")
+            )) {
 
                 Boolean testTrueFinal = fileNameWithoutExtension.matches("^.*test\\d*$");
                 Boolean testsTrueFinal = fileNameWithoutExtension.matches("^.*tests\\d*$");
@@ -246,20 +251,20 @@ public class JNoseCore implements PropertyChangeListener{
                     LOGGER.log(Level.INFO, "getFilesTest: " + testClass.getPathFile());
                     String productionFileName = "";
                     int index = 0;
-                    if(testTrueInicio) index = 0;
-                    if(testsTrueInicio) index = 0;
-                    if(testTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("test");
-                    if(testsTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("tests");
+                    if (testTrueInicio) index = 0;
+                    if (testsTrueInicio) index = 0;
+                    if (testTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("test");
+                    if (testsTrueFinal) index = testClass.getName().toLowerCase().lastIndexOf("tests");
 
                     if (index > 0) {
-                        if(testTrueFinal)
+                        if (testTrueFinal)
                             productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("test")) + ".java";
-                        if(testsTrueFinal)
+                        if (testsTrueFinal)
                             productionFileName = testClass.getName().substring(0, testClass.getName().toLowerCase().lastIndexOf("tests")) + ".java";
-                    }else{
-                        if(testTrueInicio)
+                    } else {
+                        if (testTrueInicio)
                             productionFileName = testClass.getName().substring(4, testClass.getName().length()) + ".java";
-                        if(testsTrueInicio)
+                        if (testsTrueInicio)
                             productionFileName = testClass.getName().substring(5, testClass.getName().length()) + ".java";
                     }
                     testClass.setProductionFile(getFileProduction(startDir.toString(), productionFileName));
@@ -317,11 +322,11 @@ public class JNoseCore implements PropertyChangeListener{
     public TestClass.JunitVersion getJUnitVersion(String directoryPath) {
         String projectName = directoryPath.substring(directoryPath.lastIndexOf(File.separatorChar) + 1, directoryPath.length());
 
-        final br.ufba.jnose.dto.TestClass.JunitVersion[] jUnitVersion = new br.ufba.jnose.dto.TestClass.JunitVersion[1];
+        final TestClass.JunitVersion[] jUnitVersion = new TestClass.JunitVersion[1];
 
         jUnitVersion[0] = TestClass.JunitVersion.None;
 
-        List<br.ufba.jnose.dto.TestClass> files = new ArrayList<>();
+        List<TestClass> files = new ArrayList<>();
         Path startDir = Paths.get(directoryPath);
         try {
             Files.walk(startDir)
@@ -334,12 +339,17 @@ public class JNoseCore implements PropertyChangeListener{
                                     fileNameWithoutExtension.matches("^.*test\\d*$") ||
                                             fileNameWithoutExtension.matches("^.*tests\\d*$") ||
                                             fileNameWithoutExtension.matches("^test.*") ||
-                                            fileNameWithoutExtension.matches("^tests.*"))) {
-                                br.ufba.jnose.dto.TestClass testClass = new br.ufba.jnose.dto.TestClass();
+                                            fileNameWithoutExtension.matches("^tests.*") ||
+                                            fileNameWithoutExtension.matches("^testcase.*") ||
+                                            fileNameWithoutExtension.matches("^testcases.*") ||
+                                            fileNameWithoutExtension.matches("^.*testcase\\d*$") ||
+                                            fileNameWithoutExtension.matches("^.*testcases\\d*$")
+                            )) {
+                                TestClass testClass = new TestClass();
                                 testClass.setProjectName(projectName);
                                 testClass.setPathFile(filePath.toString());
                                 if (isTestFile(testClass)) {
-                                    if(!testClass.getJunitVersion().equals(TestClass.JunitVersion.None)){
+                                    if (!testClass.getJunitVersion().equals(TestClass.JunitVersion.None)) {
                                         jUnitVersion[0] = testClass.getJunitVersion();
                                     }
                                 }
@@ -362,12 +372,15 @@ public class JNoseCore implements PropertyChangeListener{
                 NodeList<?> nodeList_members = classAtual.getMembers();
                 testClass.setNumberMethods(classAtual.getMembers().size());
                 isTestClass = flowClass(nodeList_members, testClass);
-                if(isTestClass)return true;
+                if (isTestClass) return true;
             } else if (node instanceof MethodDeclaration) {
+                // test method can be written without @Test annotation specially in Junit-3
+                // In the test class, test method usually contains the 'test' prefix or suffix even if it does not contain @Test annotation.
+                if (((MethodDeclaration) node).getName().toString().toLowerCase().contains("test")) return true;
                 isTestClass = flowClass(((MethodDeclaration) node).getAnnotations(), testClass);
-                if(isTestClass)return true;
+                if (isTestClass) return true;
             } else if (node instanceof AnnotationExpr) {
-                if(((AnnotationExpr) node).getNameAsString().toLowerCase().contains("test")){
+                if (((AnnotationExpr) node).getNameAsString().toLowerCase().contains("test")) {
                     return true;
                 }
             }
@@ -421,26 +434,26 @@ public class JNoseCore implements PropertyChangeListener{
         setLineSumTestSmells(testClass);
     }
 
-    private void setLineSumTestSmells(TestClass testClass){
+    private void setLineSumTestSmells(TestClass testClass) {
 
-        Map<String,Integer> mapaSoma = new HashMap<>();
+        Map<String, Integer> mapaSoma = new HashMap<>();
 
         List<TestSmell> listTestSmells = testClass.getListTestSmell();
 
-        String[] lista = {"Unknown Test","IgnoredTest","Resource Optimism","Magic Number Test","Redundant Assertion","Sensitive Equality","Verbose Test","Sleepy Test","Lazy Test","Duplicate Assert","Eager Test","Assertion Roulette","Conditional Test Logic","Constructor Initialization","Default Test","EmptyTest","Exception Catching Throwing","General Fixture","Mystery Guest","Print Statement","Dependent Test"};
-        for(String testsmellsName : lista){
-            if(mapaSoma.get(testsmellsName) == null){
-                mapaSoma.put(testsmellsName,0);
+        String[] lista = {"Unknown Test", "IgnoredTest", "Resource Optimism", "Magic Number Test", "Redundant Assertion", "Sensitive Equality", "Verbose Test", "Sleepy Test", "Lazy Test", "Duplicate Assert", "Eager Test", "Assertion Roulette", "Conditional Test Logic", "Constructor Initialization", "Default Test", "EmptyTest", "Exception Catching Throwing", "General Fixture", "Mystery Guest", "Print Statement", "Dependent Test"};
+        for (String testsmellsName : lista) {
+            if (mapaSoma.get(testsmellsName) == null) {
+                mapaSoma.put(testsmellsName, 0);
             }
         }
 
-        for(TestSmell testsmells : listTestSmells){
-            if(mapaSoma.get(testsmells.getName()) == null){
-                mapaSoma.put(testsmells.getName(),0);
+        for (TestSmell testsmells : listTestSmells) {
+            if (mapaSoma.get(testsmells.getName()) == null) {
+                mapaSoma.put(testsmells.getName(), 0);
             }
 
             Integer valorAtual = mapaSoma.get(testsmells.getName());
-            mapaSoma.put(testsmells.getName(),valorAtual+1);
+            mapaSoma.put(testsmells.getName(), valorAtual + 1);
         }
 
         testClass.setLineSumTestSmells(mapaSoma);
